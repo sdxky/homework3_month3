@@ -24,7 +24,7 @@ public class ContinentFragment extends Fragment implements OnItemClick {
     private ContinentAdapter continentAdapter;
 
 
-    private ArrayList<String> countryList = new ArrayList<>();
+    private ArrayList<String> continentList = new ArrayList<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -37,25 +37,29 @@ public class ContinentFragment extends Fragment implements OnItemClick {
         super.onViewCreated(view, savedInstanceState);
 
 
-        continentAdapter = new ContinentAdapter(countryList, this);
-        binding.rvContinent.setAdapter(continentAdapter);
+        if (continentAdapter == null) {
+            continentAdapter = new ContinentAdapter(continentList, this);
+            binding.rvContinent.setAdapter(continentAdapter);
+        }
 
-        loadData();
+        if (continentList.isEmpty()) { // Загружаем данные только если список пуст
+            loadData();
+        }
     }
 
     private void loadData() {
-        countryList.add("Eurasia");
-        countryList.add("Africa");
-        countryList.add("North America");
-        countryList.add("South America");
-        countryList.add("Australia");
+        continentList.add("Eurasia");
+        continentList.add("Africa");
+        continentList.add("North America");
+        continentList.add("South America");
+        continentList.add("Australia");
     }
 
 
     @Override
     public void onClick(int position) {
         Bundle bundle = new Bundle();
-        String continent = countryList.get(position);
+        String continent = continentList.get(position);
         bundle.putString("key1", continent);
         CountryFragment secondFragment = new CountryFragment();
         secondFragment.setArguments(bundle);
