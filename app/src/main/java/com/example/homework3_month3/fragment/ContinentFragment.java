@@ -42,7 +42,7 @@ public class ContinentFragment extends Fragment implements OnItemClick {
             binding.rvContinent.setAdapter(continentAdapter);
         }
 
-        if (continentList.isEmpty()) { // Загружаем данные только если список пуст
+        if (continentList.isEmpty()) {
             loadData();
         }
     }
