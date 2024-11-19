@@ -1,54 +1,62 @@
 package com.example.homework3_month3.adapter;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.homework3_month3.OnItemClick;
 import com.example.homework3_month3.databinding.ItemCountryBinding;
 
-import java.util.ArrayList;
+public class CountryAdapter extends ListAdapter<String, CountryAdapter.CountryViewHolder> {
 
+    private final OnClickListener onClickListener;
 
-public class CountryAdapter extends RecyclerView.Adapter<CountryViewHolder> {
-    private ArrayList<String> countryList;
-    private OnItemClick onItemClick;
-
-    public CountryAdapter(ArrayList<String> countryList, OnItemClick onClick) {
-        this.countryList = countryList;
-        this.onItemClick = onClick;
+    public CountryAdapter(OnClickListener onClickListener) {
+        super(DIFF_CALLBACK);
+        this.onClickListener = onClickListener;
     }
+
+    private static final DiffUtil.ItemCallback<String> DIFF_CALLBACK = new DiffUtil.ItemCallback<String>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+            return oldItem.equals(newItem);
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
 
     @NonNull
     @Override
     public CountryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new CountryViewHolder(ItemCountryBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false)) ;
+        ItemCountryBinding binding = ItemCountryBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new CountryViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CountryViewHolder holder, int position) {
-        holder.onBind(countryList.get(position));
-        holder.itemView.setOnClickListener(v -> {
-            onItemClick.onClick(position);
-        });
+        String city = getItem(position);
+        holder.bind(city);
     }
 
-    @Override
-    public int getItemCount() {
-        return countryList.size();
+    public class CountryViewHolder extends RecyclerView.ViewHolder {
+        private final ItemCountryBinding binding;
+
+        public CountryViewHolder(ItemCountryBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(String city) {
+            binding.tvCountry.setText(city);
+            itemView.setOnClickListener(v -> onClickListener.onClick(city));
+        }
     }
-}
-class CountryViewHolder extends RecyclerView.ViewHolder {
-    private ItemCountryBinding binding;
-    public CountryViewHolder(@NonNull ItemCountryBinding binding) {
-        super(binding.getRoot());
-        this.binding = binding;
-    }
-    public void onBind(String country){
-        binding.tvCountry.setText(country);
+
+    public interface OnClickListener {
+        void onClick(String city);
     }
 }

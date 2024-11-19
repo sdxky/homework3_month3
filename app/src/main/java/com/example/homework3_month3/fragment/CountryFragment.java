@@ -1,79 +1,64 @@
 package com.example.homework3_month3.fragment;
 
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.homework3_month3.OnItemClick;
 import com.example.homework3_month3.R;
-import com.example.homework3_month3.adapter.CountryAdapter;
 import com.example.homework3_month3.databinding.FragmentCountryBinding;
+import com.example.homework3_month3.adapter.CountryAdapter;
+import java.util.Arrays;
+import java.util.List;
 
-import java.util.ArrayList;
-import java.util.Objects;
+public class CountryFragment extends Fragment {
 
-
-public class CountryFragment extends Fragment implements OnItemClick {
     private FragmentCountryBinding binding;
-    private ArrayList<String> countryList = new ArrayList<>();
 
+    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentCountryBinding.inflate(getLayoutInflater());
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentCountryBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        CountryAdapter countryAdapter = new CountryAdapter(countryList, this);
-        assert getArguments() != null;
-        String continent = getArguments().getString("key1");
-        assert continent != null;
-        position(continent);
+
+        String continent = getArguments() != null ? getArguments().getString("Continent") : "Unknown";
+
+        CountryAdapter countryAdapter = new CountryAdapter(country -> {
+            CityFragment cityFragment = new CityFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("Country", country);
+            cityFragment.setArguments(bundle);
+
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, cityFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         binding.rvCountry.setAdapter(countryAdapter);
 
-    }
-    private void position(String continent) {
-        if (Objects.equals(continent, "Eurasia")) {
-            countryList.add("Russia");
-            countryList.add("Kyrgyzstan");
-            countryList.add("China");
-        } else if (Objects.equals(continent, "Africa")) {
-            countryList.add("Egypt");
-            countryList.add("Qatar");
-            countryList.add("Nigeria");
-        } else if (Objects.equals(continent, "North America")) {
-            countryList.add("USA");
-            countryList.add("Canada");
-            countryList.add("Mexico");
-        } else if (Objects.equals(continent, "South America")) {
-            countryList.add("Brazil");
-            countryList.add("Argentina");
-            countryList.add("Peru");
-        } else if (Objects.equals(continent, "Australia")) {
-            countryList.add("Australia");
-        }
+        List<String> countries = getCountriesByContinent(continent);
+        countryAdapter.submitList(countries);
     }
 
-    @Override
-    public void onClick(int position) {
-        Bundle bundle = new Bundle();
-        String country = countryList.get(position);
-        bundle.putString("key2", country);
-        CityFragment cityFragment = new CityFragment();
-        cityFragment.setArguments(bundle);
-        requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, cityFragment)
-                .addToBackStack(null)
-                .commit();
+    private List<String> getCountriesByContinent(String continent) {
+        switch (continent) {
+            case "Africa":
+                return Arrays.asList("Nigeria", "South Africa", "Egypt");
+            case "Asia":
+                return Arrays.asList("China", "India", "Japan");
+            case "Europe":
+                return Arrays.asList("Germany", "France", "Italy");
+            // Добавить другие страны сюда
+            default:
+                return Arrays.asList();
+        }
     }
 }
